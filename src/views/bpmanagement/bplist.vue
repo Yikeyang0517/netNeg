@@ -71,7 +71,7 @@
       </el-table-column>
       <el-table-column label="沟通记录" align="center" width="95">
         <template slot-scope="{row}">
-          <svg-icon class="link-type" icon-class="peoples" @click="goContactList(0)" />
+          <svg-icon class="link-type" icon-class="peoples" @click="goContactList(row.bpid)" />
         </template>
       </el-table-column>
       <el-table-column label="营业负责" width="100px" align="center">
@@ -290,7 +290,7 @@
   </div>
 </template>
 <script>
-import { fetchList, searchItemSales, DeleteBP, createArticle, searchBP, updateArticle } from '@/api/article'
+import { fetchList, getSalesList, DeleteBP, createArticle, searchBP, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -550,7 +550,7 @@ export default {
     },
     getMasterList(){
     //获取营业负责人List(检索用)
-      searchItemSales().then(response => {
+      getSalesList().then(response => {
         this.salesOptions = response.data
         console.log('返回营业负责人list')
         /* this.salesOptions = response.data */
@@ -576,11 +576,11 @@ export default {
         }, 1.5 * 1000)
       })
     },
-    goContactList(member){
-      if(member==0){
+    goContactList(bpid){
+      if(bpid==0){
         this.$router.push({path:'/bpmanagement/contactlist'})
       }
-     /* this.$router.push({path:'/contactlist'},query:{Id:member}) */
+      /* this.$router.push({path:'/bpmanagement/contactlist',query:{Id:bpid}}) */
     },
     resetTemp() {
       this.temp = {

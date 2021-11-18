@@ -1,28 +1,28 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-select v-model="searchQuery.mothod" placeholder="沟通类别" clearable style="width: 200px" class="filter-item">
-        <el-option v-for="comp in methodOptions" :key="comp.key" :label="comp.value" :value="comp.value" />
+      <el-select v-model="searchQuery.type" placeholder="沟通类别" clearable style="width: 200px" class="filter-item">
+        <el-option v-for="comp in cnttTypeOptions" :key="comp.key" :label="comp.value" :value="comp.key" />
       </el-select>
       <el-select v-model="searchQuery.company" placeholder="协力公司" clearable style="width: 200px;margin-left: 10px;" class="filter-item">
-        <el-option v-for="comp in companyOptions" :key="comp.code" :label="comp.name" :value="comp.name" />
+        <el-option v-for="comp in companyOptions" :key="comp.key" :label="comp.value" :value="comp.key" />
       </el-select>
-      <el-select v-model="searchQuery.company" placeholder="项目名称" clearable style="width: 200px;margin-left: 10px;" class="filter-item">
-        <el-option v-for="comp in companyOptions" :key="comp.code" :label="comp.name" :value="comp.name" />
+      <el-select v-model="searchQuery.prj" placeholder="项目名称" clearable style="width: 200px;margin-left: 10px;" class="filter-item">
+        <el-option v-for="comp in prjNameOptions" :key="comp.key" :label="comp.value" :value="comp.key" />
       </el-select>
-      <el-select v-model="searchQuery.company" placeholder="客户人员" clearable style="width: 200px;margin-left: 10px;" class="filter-item">
-        <el-option v-for="comp in companyOptions" :key="comp.code" :label="comp.name" :value="comp.name" />
+      <el-select v-model="searchQuery.custpsn" placeholder="客户人员" clearable style="width: 200px;margin-left: 10px;" class="filter-item">
+        <el-option v-for="comp in custpsnOptions" :key="comp.key" :label="comp.value" :value="comp.key" />
+      </el-select></br>
+      <el-select v-model="searchQuery.person" placeholder="技术人员" clearable style="width: 200px;" class="filter-item">
+        <el-option v-for="comp in personOptions" :key="comp.key" :label="comp.value" :value="comp.key" />
       </el-select>
-      <el-select v-model="searchQuery.company" placeholder="技术人员" clearable style="width: 200px;margin-left: 10px;" class="filter-item">
-        <el-option v-for="comp in companyOptions" :key="comp.code" :label="comp.name" :value="comp.name" />
+      <el-select v-model="searchQuery.sales" placeholder="营业负责" clearable class="filter-item" style="width: 200px;margin-left: 10px;white-space: pre-wrap;">
+        <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.key" />
       </el-select>
-      <el-select v-model="searchQuery.sales" placeholder="营业负责" clearable class="filter-item" style="width: 200px;white-space: pre-wrap;">
-        <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.value" />
-      </el-select>
-      <el-date-picker v-model="searchQuery.startime" type="datetime"clearable class="filter-item" style="margin-left: 10px;" placeholder="沟通记录开始时间" />
+      <el-date-picker v-model="searchQuery.startime" type="date"clearable class="filter-item" style="margin-left: 10px;" placeholder="沟通记录开始时间" />
       <span> - </span>
-      <el-date-picker v-model="searchQuery.endtime" type="datetime" class="filter-item" placeholder="沟通记录结束时间" />
-      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" style="margin-left: 20px;white-space: pre-wrap;" @click="search">
+      <el-date-picker v-model="searchQuery.endtime" type="date" class="filter-item" style="white-space: pre-wrap;" placeholder="沟通记录结束时间" /></br>
+      <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" style="margin-left: 20px;" @click="search">
         搜索
       </el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
@@ -41,7 +41,6 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
     >
       <el-table-column label="ID" prop="id" align="center" width="50" :class-name="getSortClass('id')">
         <template slot-scope="{row}">
@@ -50,7 +49,7 @@
       </el-table-column>
       <el-table-column label="提醒" class-name="status-col" width="150">
         <template slot-scope="{row}">
-          <el-tag v-if="row.contactflg" :title="row.contactflg=1?'该联系了':null" style="background-color: #99CC33">
+          <!-- <el-tag v-if="row.contactflg" :title="row.contactflg=1?'该联系了':null" style="background-color: #99CC33">
             <svg-icon icon-class="email" />
           </el-tag>
           <el-tag v-if="row.prjflg" :title="row.prjflg=1?'有在谈项目':null" style="background-color: #FFCC33">
@@ -58,17 +57,17 @@
           </el-tag>
           <el-tag v-if="row.wngtext" :title="row.wngtext" style="background-color: #FF6633">
             <svg-icon icon-class="star" />
-          </el-tag>
+          </el-tag> -->
         </template>
       </el-table-column>
       <el-table-column label="项目名称" width="100px">
         <template slot-scope="{row}">
-          <span>{{ row.bpShort }}</span>
+          <span>{{ row.prjName }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="客户人员" width="100px">
+      <el-table-column label="客户人员" width="200px">
         <template slot-scope="{row}">
-          <span>{{ row.bpShort }} | {{ row.member }}</span>
+          <span>{{ row.bpName }} | {{ row.custpsnName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="营业负责" width="100px" align="center">
@@ -78,52 +77,64 @@
       </el-table-column>
       <el-table-column label="沟通日期" width="120px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.contactdate | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.contactdate | parseTime('{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="沟通类别" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.method }}</span>
+          <span v-if="row.cnttType == '00'">录入</span>
+          <span v-if="row.cnttType == '01'">短信</span>
+          <span v-if="row.cnttType == '02'">通话</span>
+          <span v-if="row.cnttType == '03'">见面</span>
+          <span v-if="row.cnttType == '04'">餐饮</span>
+          <span v-if="row.cnttType == '05'">出游</span>
+          <span v-if="row.cnttType == '20'">要人</span>
+          <span v-if="row.cnttType == '21'">提案</span>
+          <span v-if="row.cnttType == '31'">客面</span>
         </template>
       </el-table-column>
       <el-table-column label="技术人员" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.empcnt }}</span>
+          <span>{{ row.psnId }}</span>
         </template>
       </el-table-column>
       <el-table-column label="提案价格" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.country }}</span>
+          <span>{{ row.price }}</span>
         </template>
       </el-table-column>
       <el-table-column label="提案面试结果" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.bpimpt }}</span>
+          <span>{{ row.result== 0?'NG':(row.result== 1?'OK':(row.result== 2?'中止':null)) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="简历可信度" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.anken }}</span>
+          <span v-if="row.resumelvl == '1'">不可信</span>
+          <span v-if="row.resumelvl == '2'">有疑点</span>
+          <span v-if="row.resumelvl == '3'">一般</span>
+          <span v-if="row.resumelvl == '4'">较可靠</span>
+          <span v-if="row.resumelvl == '5'">可信赖</span>
         </template>
       </el-table-column>
       <el-table-column label="地点" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.peonum }}</span>
+          <span>{{ row.address }}</span>
         </template>
       </el-table-column>
       <el-table-column label="时间" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.ptnnum }}</span>
+          <span>{{ row.cnntime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="耗时时间" width="100px" align="center">
+      <el-table-column label="耗时分钟" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.audtnum }}</span>
+          <span>{{ row.workhours }}</span>
         </template>
       </el-table-column>
       <el-table-column label="摘要" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.bpMemo }}</span>
+          <span>{{ row.psncnttmemo }}</span>
         </template>
       </el-table-column>
       <el-table-column label="登记日时" width="100px" align="center">
@@ -131,7 +142,7 @@
           <span>{{ row.createtime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="登记人" width="100px" align="center">
+      <el-table-column label="登记人员" width="100px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.createuser }}</span>
         </template>
@@ -141,7 +152,7 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(row,$index)">
+          <el-button size="mini" type="danger" @click="handleDelete(row.custcnttId)">
             删除
           </el-button>
         </template>
@@ -152,81 +163,58 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="公司名称" prop="bpName">
-          <el-input v-model="temp.bpName" />
+        <el-form-item label="项目名称" prop="prjName">
+          <el-input v-model="temp.prjName" />
         </el-form-item>
-        <el-form-item label="简称" prop="bpShort">
-          <el-input v-model="temp.bpShort" />
-        </el-form-item>
-        <el-form-item label="客户编号" prop="bpCode">
-          <el-input v-model="temp.bpCode" />
-        </el-form-item>
-        <el-form-item label="公司网址" prop="hpurl">
-          <el-input v-model="temp.hpurl" />
+        <el-form-item label="客户人员" prop="custpsnName">
+          <el-select v-model="temp.custpsnName" class="filter-item" placeholder="请选择客户人员">
+            <el-option v-for="item in custpsnOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
         <el-form-item label="营业负责" prop="sales">
           <el-select v-model="temp.sales" class="filter-item" placeholder="请选择营业负责人">
-            <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.value" />
+            <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
-        <el-form-item label="公司人数" prop="empcnt">
-          <el-input v-model="temp.empcnt" />
+        <el-form-item label="沟通日期" prop="contactdate">
+          <el-date-picker v-model="temp.contactdate" type="date" placeholder="请选择沟通日期" />
         </el-form-item>
-        <el-form-item label="所属国" prop="country">
-          <el-input v-model="temp.country" />
+        <el-form-item label="沟通类别" prop="cnttType">
+          <el-select v-model="temp.cnttType" class="filter-item" placeholder="请选择沟通类别">
+            <el-option v-for="item in cnttTypeOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="重要度" prop="bpimpt">
-          <el-input v-model="temp.bpimpt" />
+        <el-form-item label="技术人员" prop="psnId">
+          <el-select v-model="temp.psnId" class="filter-item" placeholder="请选择技术人员">
+            <el-option v-for="item in personOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="受注案件" prop="anken">
-          <el-input v-model="temp.anken" />
+        <el-form-item label="提案价格" prop="price">
+          <el-input v-model="temp.price" />
         </el-form-item>
-        <el-form-item label="受注人次" prop="peonum">
-          <el-input v-model="temp.peonum" />
+        <el-form-item label="提案面试结果" prop="result">
+          <el-select v-model="temp.result" class="filter-item" placeholder="请选择面试结果">
+            <el-option v-for="item in resultOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="协力人次" prop="ptnnum">
-          <el-input v-model="temp.ptnnum" />
+        <el-form-item label="简历可信度" prop="resumelvl">
+          <el-select v-model="temp.resumelvl" class="filter-item" placeholder="请选择简历可信度">
+            <el-option v-for="item in resumelvlOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="客面人次" prop="audtnum">
-          <el-input v-model="temp.audtnum" />
-        </el-form-item>
-        <el-form-item label="提案人次" prop="apltnum">
-          <el-input v-model="temp.apltnum" />
-        </el-form-item>
-        <el-form-item label="技术人数" prop="pronum">
-          <el-input v-model="temp.pronum" />
-        </el-form-item>
-        <el-form-item label="客户人数" prop="bpcustm">
-          <el-input v-model="temp.bpcustm" />
-        </el-form-item>
-        <el-form-item label="沟通频率" prop="maxcnttdays">
-          <el-input v-model="temp.maxcnttdays" />
-        </el-form-item>
-        <el-form-item label="邮编" prop="zipcode">
-          <el-input v-model="temp.zipcode" />
-        </el-form-item>
-        <el-form-item label="地址" prop="address">
+        <el-form-item label="地点" prop="address">
           <el-input v-model="temp.address" />
         </el-form-item>
-        <el-form-item label="电话" prop="tel">
-          <el-input v-model="temp.tel" />
+        <el-form-item label="时间" prop="cnntime">
+          <el-input v-model="temp.cnntime" />
         </el-form-item>
-        <el-form-item label="传真" prop="fax">
-          <el-input v-model="temp.fax" />
-        </el-form-item>
-        <el-form-item label="优先提醒度" prop="wnglvl">
-          <el-select v-model="temp.wnglvl" class="filter-item" placeholder="请选择优先度">
-            <el-option v-for="item in SuperiorityOptions" :key="item" :label="item" :value="item" />
+        <el-form-item label="耗时分钟" prop="workhours">
+          <el-select v-model="temp.workhours" class="filter-item" placeholder="请选择耗时分钟">
+            <el-option v-for="item in workhoursOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
-        <el-form-item label="提醒事项" prop="wngtext">
-          <el-input v-model="temp.wngtext" />
-        </el-form-item>
-        <el-form-item label="在谈项目" prop="prjflg">
-          <el-input v-model="temp.prjflg" />
-        </el-form-item>
-        <el-form-item label="笔记" prop="bpMemo">
-          <el-input v-model="temp.bpMemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+        <el-form-item label="摘要" prop="psncnttmemo">
+          <el-input v-model="temp.psncnttmemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
         <el-form-item label="登记日时" prop="createtime">
           <el-date-picker v-model="temp.createtime" type="datetime" placeholder="请选择创建时间" />
@@ -258,23 +246,11 @@
 </template>
 
 <script>
-import { fetchList, searchItemSales, fetchPv, createArticle, updateArticle } from '@/api/article'
+import { fetchList, contactInitList, getSalesList, getPrjList, getCustpsnList, getPersonList, contactSearch, DeleteContact, fetchPv, createArticle, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
-
-// arr to obj, such as { CN : "China", US : "USA" }
-const calendarTypeKeyValue = calendarTypeOptions.reduce((acc, cur) => {
-  acc[cur.key] = cur.display_name
-  return acc
-}, {})
 
 export default {
   name: 'ComplexTable',
@@ -301,34 +277,20 @@ export default {
 
         {
           id: 1,
-          contactflg: null,
-          bpShort: 'ygp',
-          bpCode: 'BP0002',
-          bpName: '会社002',
-          hpurl: 'https://www.yahoo.co.jp',
-          contactdate: 20211105,
-          sales: 'YangXF',
-          empcnt: '19',
-          country: '日本',
-          bpimpt: 2,
-          anken: '○○证券次期基盘系统开发',
-          peonum: 20,
-          ptnnum: 5,
-          audtnum: 35,
-          apltnum: 50,
-          pronum: 15,
-          bpcustm: 3,
-          maxcnttdays: 30,
-          zipcode: '3320001',
-          address: '川口市青木区2-1-1',
-          tel: '08079064567',
-          fax: '03023456',
-          bpMemo: 'memommmmmmmm',
-          contactcnt: 3,
-          wnglvl: null,
-          wngtext: null,
-          prjflg: null,
-          prjflgMemo: '有在谈项目！',
+          prjName: 'mock项目01',
+          bpName: 'mock客户01',
+          custpsnName: 'mock客户人员01',
+          sales: 'mock销售01',
+          contactdate: 20211201111201,
+          cnttType: 1,
+          psnId: 1,
+          price: 1,
+          result: '01',
+          resumelvl: 1,
+          address: 'mock地址01',
+          cnntime: 1,
+          workhours: 1,
+          psncnttmemo: '有在谈项目！',
           createtime: 20211101210912,
           createuser: '操作员Y'
         }
@@ -337,33 +299,73 @@ export default {
       listLoading: false,
       listQuery: { userId: 'yxf' },
       searchQuery:{
+        type: '',
         company: '',
+        prj: '',
+        custpsn: '',
+        person: '',
         sales: '',
+        stardate: '',
+        enddate: '',
         },
-        methodOptions:  [
-          { key: '1', value: '录入' },
-          { key: '2', value: '短信' },
-          { key: '3', value: '通话' },
-          { key: '4', value: '见面' },
-          { key: '5', value: '餐饮' },
-          { key: '6', value: '出游' },
-          { key: '7', value: '要人' },
-          { key: '8', value: '提案' },
-          { key: '9', value: '客面' },
+        cnttTypeOptions:  [
+          { key: '00', value: '录入' },
+          { key: '01', value: '短信' },
+          { key: '02', value: '通话' },
+          { key: '03', value: '见面' },
+          { key: '04', value: '餐饮' },
+          { key: '05', value: '出游' },
+          { key: '20', value: '要人' },
+          { key: '21', value: '提案' },
+          { key: '31', value: '客面' },
         ],
+        resumelvlOptions:  [
+          { key: '1', value: '不可信' },
+          { key: '2', value: '有疑点' },
+          { key: '3', value: '一般' },
+          { key: '4', value: '较可靠' },
+          { key: '5', value: '可信赖' },
+          ],
+        resultOptions:  [
+          { key: '0', value: 'NG' },
+          { key: '1', value: 'OK' },
+          { key: '2', value: '中止' },
+          ],
+        resumelvlOptions:  [
+          { key: '1', value: '不可信' },
+          { key: '2', value: '有疑点' },
+          { key: '3', value: '一般' },
+          { key: '4', value: '较可靠' },
+          { key: '5', value: '可信赖' },
+          ],
+        workhoursOptions:  [
+          { key: '1', value: '15' },
+          { key: '2', value: '30' },
+          { key: '3', value: '45' },
+          { key: '4', value: '60' },
+          { key: '5', value: '90' },
+          ],
       companyOptions:  [
-        { code: '', name: '' }
+        { key: '', value: '' }
+      ],
+      prjNameOptions: [
+        { key: '', value: '' }
+      ],
+      custpsnOptions:  [
+        { key: '', value: '' }
+      ],
+      personOptions:  [
+        { key: '', value: '' }
       ],
       salesOptions: [
         { key: '', value: '' }
       ],
       SuperiorityOptions: ['不急', '可缓', '一般', '优先', '紧急', '特急'],
-      calendarTypeOptions,
       sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
       statusOptions: ['需要联系', '在谈项目', '提醒事项'],
       temp: {
         id: undefined,
-        company: 1,
+        company : 1,
         remark: '',
         timestamp: new Date(),
         title: '',
@@ -388,28 +390,31 @@ export default {
     }
   },
   created() {
+    /* let self = this
+    self.getParams() */
     this.getList()
     this.getMasterList()
   },
+  watch () {
+  /* '$route': 'getParams' */
+  },
   methods: {
+    /* getParams () {
+      let bpid = this.$route.query.Id
+      if(bpid !==null && bpid !==''){
+      this.listLoading = true
+      //TODO 带参查询
+      }else{
+        this.getList()
+      }
+      }, */
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        console.log('已经返回请求数据、、、、、、、、、、')
-        console.log(response.data)
+      contactInitList().then(response => {
         this.list = response.data
         this.total = response.total
         this.listLoading = false
-        //获取当前BP名
-        /* this.companyOptions.shift() */
-        console.log(response.data.length)
-        this.companyOptions.shift()
-        for(var i=0;i<response.data.length;i++){
-          var obj = {
-            code: response.data[i].bpCode,
-            name: response.data[i].bpShort + ' | ' +response.data[i].bpName}
-          this.companyOptions.push(obj)
-        }
+
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -418,11 +423,32 @@ export default {
     },
     getMasterList(){
     //获取营业负责人List(检索用)
-      searchItemSales().then(response => {
+      getSalesList().then(response => {
         this.salesOptions = response.data
         console.log('返回营业负责人list')
         /* this.salesOptions = response.data */
         console.log(this.salesOptions)
+      })
+    //获取BPList(检索用)
+      fetchList(this.listQuery).then(response => {
+        for(var i=0;i<response.data.length;i++){
+          var obj = {
+            key: response.data[i].bpid,
+            value: response.data[i].bpShort + ' | ' +response.data[i].bpName}
+          this.companyOptions.push(obj)
+        }
+      })
+      //获取prjList(检索用)
+      getPrjList().then(response => {
+        this.prjNameOptions = response.data
+      })
+      //获取custpsnList(检索用)
+      getCustpsnList().then(response => {
+        this.custpsnOptions = response.data
+      })
+      //获取personList(检索用)
+      getPersonList().then(response => {
+        this.personOptions = response.data
       })
     },
     jumpUrl(e){
@@ -432,8 +458,20 @@ export default {
     },
     search() {
       console.log('检索时传参内容')
+      if(this.searchQuery.startime != null){
+        this.searchQuery.stardate= this.dateFormat(this.searchQuery.startime.getTime()-24*60*60*1000)
+      }else{
+        this.searchQuery.stardate = null
+      }
+      if(this.searchQuery.endtime != null){
+        this.searchQuery.enddate= this.dateFormat(this.searchQuery.endtime.getTime()+24*60*60*1000)
+      }else{
+        this.searchQuery.enddate = null
+      }
+
       console.log(this.searchQuery)
-      fetchList(this.searchQuery).then(response => {
+      contactSearch(this.searchQuery).then(response => {
+       console.log(response.data)
         this.list = response.data
         this.total = response.total
 
@@ -442,20 +480,17 @@ export default {
           this.listLoading = false
         }, 1.5 * 1000)
       })
-      this.getList()
     },
-    sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
+    dateFormat:function(time) {
+        var date=new Date(time);
+        var year=date.getFullYear();
+        /* 在日期格式中，月份是从0开始的，因此要加0
+         * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+         * */
+        var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1
+        var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate()
+        // 拼接
+        return year+''+month+day
     },
     resetTemp() {
       this.temp = {
@@ -522,14 +557,13 @@ export default {
         }
       })
     },
-    handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
+    handleDelete(id) {
+      DeleteContact(id).then(response => {
+        this.getList()
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
       })
-      this.list.splice(index, 1)
     },
     handleFetchPv(pv) {
       fetchPv(pv).then(response => {

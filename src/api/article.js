@@ -10,7 +10,7 @@ export function fetchList(query) {
   })
 }
 //获取营业负责人List(检索用)
-export function searchItemSales() {
+export function getSalesList() {
   return request({
     url: '/BPList/getSalesList',
     method: 'get',
@@ -18,7 +18,36 @@ export function searchItemSales() {
   })
 }
 
-//根据条件检索
+
+//获取prjList(检索用)
+export function getPrjList() {
+  return request({
+    url: '/BPList/getPrjList',
+    method: 'get',
+    baseURL: '/backend' // 直接通过覆盖的方式
+  })
+}
+
+//获取CustpsnList(检索用)
+export function getCustpsnList() {
+  return request({
+    url: '/BPList/getCustpsnList',
+    method: 'get',
+    baseURL: '/backend' // 直接通过覆盖的方式
+  })
+}
+
+//获取PersonList(检索用)
+export function getPersonList() {
+  return request({
+    url: '/BPList/getPersonList',
+    method: 'get',
+    baseURL: '/backend' // 直接通过覆盖的方式
+  })
+}
+
+
+//根据条件检索BPList
 export function searchBP(query) {
   return request({
     url: '/BPList/getSearch',
@@ -37,7 +66,7 @@ export function updateArticle(data) {
   })
 }
 
-//删除一条数据
+//删除一条BP数据
 export function DeleteBP(query) {
   return request({
     url: '/BPList/deleteById',
@@ -56,11 +85,31 @@ export function createArticle(data) {
     data
   })
 }
-
-export function fetchArticle(id) {
+//获取全部contactList
+export function contactInitList() {
   return request({
-    url: '/vue-element-admin/article/detail',
+    url: '/BPList/getcntList',
     method: 'get',
-    params: { id }
+    baseURL: '/backend' // 直接通过覆盖的方式
+  })
+}
+
+//根据条件检索BPList
+export function contactSearch(query) {
+  return request({
+    url: '/BPList/getContactSearch',
+    method: 'get',
+    params: query,
+    baseURL: '/backend' // 直接通过覆盖的方式
+  })
+}
+
+//删除一条BP数据
+export function DeleteContact(id) {
+  return request({
+    url: '/BPList/deleteContactById',
+    method: 'get',
+    baseURL: '/backend', // 直接通过覆盖的方式
+    params: {id}
   })
 }
