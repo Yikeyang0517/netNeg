@@ -28,9 +28,9 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         导出
-      </el-button>
+      </el-button> -->
     </div>
 
     <el-table
@@ -72,7 +72,7 @@
       </el-table-column>
       <el-table-column label="营业负责" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.sales }}</span>
+          <span>{{ row.salesName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="沟通日期" width="120px" align="center">
@@ -95,7 +95,7 @@
       </el-table-column>
       <el-table-column label="技术人员" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.psnId }}</span>
+          <span>{{ row.psnName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="提案价格" width="100px" align="center">
@@ -105,7 +105,10 @@
       </el-table-column>
       <el-table-column label="提案面试结果" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.result== 0?'NG':(row.result== 1?'OK':(row.result== 2?'中止':null)) }}</span>
+          <span v-if="row.result == '0'">NG</span>
+          <span v-if="row.result == '1'">OK</span>
+          <span v-if="row.result == '2'">中止</span>
+          <!-- <span>{{ row.result== 0?'NG':(row.result== 1?'OK':(row.result== 2?'中止':null)) }}</span> -->
         </template>
       </el-table-column>
       <el-table-column label="简历可信度" width="100px" align="center">
@@ -162,17 +165,19 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
         <el-form-item label="项目名称" prop="prjName">
-          <el-input v-model="temp.prjName" />
+          <el-select v-model="temp.prjName" class="filter-item" placeholder="请选择项目名称">
+            <el-option v-for="item in prjNameOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
         <el-form-item label="客户人员" prop="custpsnName">
           <el-select v-model="temp.custpsnName" class="filter-item" placeholder="请选择客户人员">
             <el-option v-for="item in custpsnOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
-        <el-form-item label="营业负责" prop="sales">
-          <el-select v-model="temp.sales" class="filter-item" placeholder="请选择营业负责人">
+        <el-form-item label="营业负责" prop="salesName">
+          <el-select v-model="temp.salesName" class="filter-item" placeholder="请选择营业负责人">
             <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -184,8 +189,8 @@
             <el-option v-for="item in cnttTypeOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
-        <el-form-item label="技术人员" prop="psnId">
-          <el-select v-model="temp.psnId" class="filter-item" placeholder="请选择技术人员">
+        <el-form-item label="技术人员" prop="psnName">
+          <el-select v-model="temp.psnName" class="filter-item" placeholder="请选择技术人员">
             <el-option v-for="item in personOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -209,9 +214,7 @@
           <el-input v-model="temp.cnntime" />
         </el-form-item>
         <el-form-item label="耗时分钟" prop="workhours">
-          <el-select v-model="temp.workhours" class="filter-item" placeholder="请选择耗时分钟">
-            <el-option v-for="item in workhoursOptions" :key="item.key" :label="item.value" :value="item.key" />
-          </el-select>
+          <el-input v-model="temp.workhours" />
         </el-form-item>
         <el-form-item label="摘要" prop="psncnttmemo">
           <el-input v-model="temp.psncnttmemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
@@ -246,7 +249,7 @@
 </template>
 
 <script>
-import { fetchList, contactInitList, getSalesList, getPrjList, getCustpsnList, getPersonList, contactSearch, DeleteContact, fetchPv, createArticle, updateArticle } from '@/api/article'
+import { fetchList, contactInitList, getSalesList, getPrjList, getCustpsnList, getPersonList, contactSearch, DeleteContact, updateContact, fetchPv, createContact } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -283,10 +286,10 @@ export default {
           sales: 'mock销售01',
           contactdate: 20211201111201,
           cnttType: 1,
-          psnId: 1,
+          psnName: 1,
           price: 1,
           result: '01',
-          resumelvl: 1,
+          resumelvl: '1',
           address: 'mock地址01',
           cnntime: 1,
           workhours: 1,
@@ -320,23 +323,16 @@ export default {
           { key: '31', value: '客面' },
         ],
         resumelvlOptions:  [
-          { key: '1', value: '不可信' },
-          { key: '2', value: '有疑点' },
-          { key: '3', value: '一般' },
-          { key: '4', value: '较可靠' },
-          { key: '5', value: '可信赖' },
+          { key: 1, value: '不可信' },
+          { key: 2, value: '有疑点' },
+          { key: 3, value: '一般' },
+          { key: 4, value: '较可靠' },
+          { key: 5, value: '可信赖' },
           ],
         resultOptions:  [
           { key: '0', value: 'NG' },
           { key: '1', value: 'OK' },
           { key: '2', value: '中止' },
-          ],
-        resumelvlOptions:  [
-          { key: '1', value: '不可信' },
-          { key: '2', value: '有疑点' },
-          { key: '3', value: '一般' },
-          { key: '4', value: '较可靠' },
-          { key: '5', value: '可信赖' },
           ],
         workhoursOptions:  [
           { key: '1', value: '15' },
@@ -392,11 +388,16 @@ export default {
   created() {
     /* let self = this
     self.getParams() */
+    if(this.$route.query){
+      this.searchQuery.company = this.$route.query.company
+      this.searchQuery.custpsn = this.$route.query.custpsn
+      console.log(this.searchQuery)
+       console.log('跳转调用search方法')
+      this.search()
+    }else{
     this.getList()
+    }
     this.getMasterList()
-  },
-  watch () {
-  /* '$route': 'getParams' */
   },
   methods: {
     /* getParams () {
@@ -457,7 +458,6 @@ export default {
      window.open(e,'_blank')
     },
     search() {
-      console.log('检索时传参内容')
       if(this.searchQuery.startime != null){
         this.searchQuery.stardate= this.dateFormat(this.searchQuery.startime.getTime()-24*60*60*1000)
       }else{
@@ -468,13 +468,13 @@ export default {
       }else{
         this.searchQuery.enddate = null
       }
-
+      console.log('检索时传参内容')
       console.log(this.searchQuery)
       contactSearch(this.searchQuery).then(response => {
-       console.log(response.data)
         this.list = response.data
         this.total = response.total
-
+        console.log('返回查询结果')
+        console.log(response.data)
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -491,6 +491,20 @@ export default {
         var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate()
         // 拼接
         return year+''+month+day
+    },
+    dateTimeFormat:function(time) {
+        var date=new Date(time);
+        var year=date.getFullYear();
+        /* 在日期格式中，月份是从0开始的，因此要加0
+         * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+         * */
+        var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+        var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+        var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+        var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+        var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+        // 拼接
+        return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds;
     },
     resetTemp() {
       this.temp = {
@@ -514,10 +528,16 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
+          const tempData = Object.assign({}, this.temp)
+          tempData.createtime = this.dateTimeFormat(new Date())
+          tempData.createuser = 'tempAccount'
+          tempData.contactdate = this.dateFormat(tempData.contactdate)
+          tempData.sales = tempData.salesName
+          tempData.prjId = tempData.prjName
+          tempData.psnId = tempData.psnName
+          tempData.custpsnId = tempData.custpsnName
+          createContact(tempData).then(() => {
+            this.getList()
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -531,6 +551,10 @@ export default {
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
+      this.temp.tempPrj = this.temp.prjName
+      this.temp.tempCustpsn = this.temp.custpsnName
+      this.temp.tempSales = this.temp.salesName
+      this.temp.tempPerson = this.temp.psnName
       this.temp.timestamp = new Date(this.temp.timestamp)
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
@@ -542,11 +566,30 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
+          tempData.updatetime = this.dateTimeFormat(new Date()) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          //返回prjId
+          if(tempData.tempPrj !== tempData.prjName){
+            tempData.prjId = tempData.prjName
+          }
+          //返回custpsnId
+          if(tempData.tempCustpsn !== tempData.custpsnName){
+            tempData.custpsnId = tempData.custpsnName
+          }
+          //返回salesId
+            if(tempData.tempSales !== tempData.salesName){
+              tempData.sales = tempData.salesName
+            }
+          //返回psnId
+            if(tempData.tempPerson !== tempData.psnName){
+              tempData.psnId = tempData.psnName
+            }
+          //沟通日时格式化
+          tempData.contactdate = this.dateFormat(tempData.contactdate)
+          updateContact(tempData).then(() => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)
             this.dialogFormVisible = false
+            this.getList()
             this.$notify({
               title: 'Success',
               message: 'Update Successfully',
@@ -565,17 +608,11 @@ export default {
         }, 1.5 * 1000)
       })
     },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
-      })
-    },
     handleDownload() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['timestamp', 'title', 'type', 'company', 'status']
-        const filterVal = ['timestamp', 'title', 'type', 'company', 'status']
+        const tHeader = ['timestamp']
+        const filterVal = ['timestamp']
         const data = this.formatJson(filterVal)
         excel.export_json_to_excel({
           header: tHeader,

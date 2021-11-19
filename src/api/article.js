@@ -94,7 +94,7 @@ export function contactInitList() {
   })
 }
 
-//根据条件检索BPList
+//根据条件检索contactList
 export function contactSearch(query) {
   return request({
     url: '/BPList/getContactSearch',
@@ -111,5 +111,26 @@ export function DeleteContact(id) {
     method: 'get',
     baseURL: '/backend', // 直接通过覆盖的方式
     params: {id}
+  })
+}
+
+//更新当前contact信息
+export function updateContact(data) {
+  return request({
+    url: '/BPList/contactUpdate',
+    method: 'post',
+    baseURL: '/backend', // 直接通过覆盖的方式
+    data
+  })
+}
+
+
+//新增一条Contact数据
+export function createContact(data) {
+  return request({
+    url: '/BPList/createContact',
+    method: 'post',
+    baseURL: '/backend', // 直接通过覆盖的方式
+    data
   })
 }

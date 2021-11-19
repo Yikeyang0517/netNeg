@@ -13,9 +13,9 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         导出
-      </el-button>
+      </el-button> -->
     </div>
 
     <el-table
@@ -66,7 +66,7 @@
       </el-table-column>
       <el-table-column label="上次沟通日期" width="120px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.contactdate | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.contactdate | parseTime('{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="沟通记录" align="center" width="95">
@@ -76,7 +76,7 @@
       </el-table-column>
       <el-table-column label="营业负责" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.sales }}</span>
+          <span>{{ row.salesName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="公司人数" width="100px" align="center">
@@ -225,8 +225,8 @@
         <el-form-item label="公司网址" prop="hpurl">
           <el-input v-model="temp.hpurl" />
         </el-form-item>
-        <el-form-item label="营业负责" prop="sales">
-          <el-select v-model="temp.sales" class="filter-item" placeholder="请选择营业负责人">
+        <el-form-item label="营业负责" prop="salesName">
+          <el-select v-model="temp.salesName" class="filter-item" placeholder="请选择营业负责人">
             <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -335,7 +335,7 @@ export default {
           bpCode: 'BP0001',
           bpName: '会社001',
           hpurl: 'https://panjiachen.github.io/vue-element-admin/#/icon/index',
-          contactdate: 20211102,
+          contactdate: '20211102',
           sales: 'YangXF',
           empcnt: '122',
           country: '日本',
@@ -359,105 +359,6 @@ export default {
           prjflg: 1,
           prjflgMemo: '有在谈项目！',
           createtime: 20211102,
-          createuser: '操作员Y'
-        },
-        {
-          id: 2,
-          contactflg: '需要联系了',
-          bpShort: 'ygp',
-          bpCode: 'BP0002',
-          bpName: '会社002',
-          hpurl: 'https://panjiachen.github.io/vue-element-admin/#/icon/index',
-          contactdate: 20211105,
-          sales: 'YangXF',
-          empcnt: '19',
-          country: '日本',
-          bpimpt: 2,
-          anken: '○○证券次期基盘系统开发',
-          peonum: 20,
-          ptnnum: 5,
-          audtnum: 35,
-          apltnum: 50,
-          pronum: 15,
-          bpcustm: 3,
-          maxcnttdays: 30,
-          zipcode: '3320001',
-          address: '川口市青木区2-1-1',
-          tel: '08079064567',
-          fax: '03023456',
-          bpMemo: 'memommmmmmmm',
-          contactcnt: 3,
-          wnglvl: null,
-          wngtext: null,
-          prjflg: 1,
-          prjflgMemo: '有在谈项目！',
-          createtime: 20211102,
-          createuser: '操作员Y'
-        },
-        {
-          id: 3,
-          contactflg: '该联系了',
-          bpShort: 'cpn',
-          bpCode: 'BP0001',
-          bpName: '会社001',
-          hpurl: 'https://panjiachen.github.io/vue-element-admin/#/icon/index',
-          contactdate: 20211102,
-          sales: 'YangXF',
-          empcnt: '122',
-          country: '日本',
-          bpimpt: 2,
-          anken: '○○证券次期基盘系统开发',
-          peonum: 20,
-          ptnnum: 5,
-          audtnum: 35,
-          apltnum: 50,
-          pronum: 15,
-          bpcustm: 3,
-          maxcnttdays: 30,
-          zipcode: '3320001',
-          address: '川口市青木区2-1-1',
-          tel: '08079064567',
-          fax: '03023456',
-          bpMemo: 'memommmmmmmm',
-          contactcnt: 3,
-          wnglvl: '紧急',
-          wngtext: '次期项目下个月要开始了',
-          prjflg: 1,
-          prjflgMemo: '有在谈项目！',
-          createtime: 20211101210912,
-          createuser: '操作员Y'
-        },
-        {
-          id: 4,
-          contactflg: null,
-          bpShort: 'ygp',
-          bpCode: 'BP0002',
-          bpName: '会社002',
-          hpurl: 'https://www.yahoo.co.jp',
-          contactdate: 20211105,
-          sales: 'YangXF',
-          empcnt: '19',
-          country: '日本',
-          bpimpt: 2,
-          anken: '○○证券次期基盘系统开发',
-          peonum: 20,
-          ptnnum: 5,
-          audtnum: 35,
-          apltnum: 50,
-          pronum: 15,
-          bpcustm: 3,
-          maxcnttdays: 30,
-          zipcode: '3320001',
-          address: '川口市青木区2-1-1',
-          tel: '08079064567',
-          fax: '03023456',
-          bpMemo: 'memommmmmmmm',
-          contactcnt: 3,
-          wnglvl: null,
-          wngtext: null,
-          prjflg: null,
-          prjflgMemo: '有在谈项目！',
-          createtime: 20211101210912,
           createuser: '操作员Y'
         }
       ],
@@ -487,9 +388,9 @@ export default {
       ],
       BPimptOptions: [
         { key: '03' , label: '○'},
-        { key: '11' , label: '重要BP'},
-        { key: '12' , label: '一般BP'},
-        { key: '90' , label: '潜在BP'}
+        { key: 11 , label: '重要BP'},
+        { key: 12 , label: '一般BP'},
+        { key: 90 , label: '潜在BP'}
       ],
       calendarTypeOptions,
       temp: {
@@ -526,8 +427,12 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        console.log('初始化数据数据、、、、、、、、、、')
-        console.log(response.data)
+        for(var i=0;i<response.data.length;i++){
+          var obj = {
+            code: response.data[i].bpid,
+            name: response.data[i].bpShort + ' | ' +response.data[i].bpName}
+          this.companyOptions.push(obj)
+        }
         this.list = response.data
         this.total = response.total
         this.listLoading = false
@@ -535,12 +440,6 @@ export default {
         /* this.companyOptions.shift() */
         console.log(response.data.length)
         this.companyOptions.shift()
-        for(var i=0;i<response.data.length;i++){
-          var obj = {
-            code: response.data[i].bpid,
-            name: response.data[i].bpShort + ' | ' +response.data[i].bpName}
-          this.companyOptions.push(obj)
-        }
         console.log(this.companyOptions)
         // Just to simulate the time of the request
         setTimeout(() => {
@@ -577,8 +476,13 @@ export default {
       })
     },
     goContactList(bpid){
-      if(bpid==0){
-        this.$router.push({path:'/bpmanagement/contactlist'})
+      if(bpid!=0){
+        this.$router.push({
+          path:'/bpmanagement/contactlist',
+          query:{
+            company:bpid,
+            }
+          })
       }
       /* this.$router.push({path:'/bpmanagement/contactlist',query:{Id:bpid}}) */
     },
@@ -604,9 +508,9 @@ export default {
           const tempData = Object.assign({}, this.temp)
           tempData.createtime = this.dateFormat(new Date())
           tempData.createuser = 'tempAccount'
+          tempData.sales = tempData.salesName
           createArticle(tempData).then(() => {
             this.getList()
-            this.dialogFormVisible = false
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -621,6 +525,7 @@ export default {
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
+      this.temp.tempSales = this.temp.salesName
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -632,6 +537,10 @@ export default {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.updatetime = this.dateFormat(new Date()) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          //返回salesId
+            if(tempData.tempSales !== tempData.salesName){
+              tempData.sales = tempData.salesName
+            }
           updateArticle(tempData).then(() => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)
