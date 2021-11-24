@@ -1,10 +1,10 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-select v-model="searchQuery.company" placeholder="协力公司" clearable style="width: 200px" class="filter-item">
-        <el-option v-for="comp in companyOptions" :key="comp.code" :label="comp.name" :value="comp.code" />
+      <el-select v-model="searchQuery.company" placeholder="协力公司" clearable filterable style="width: 200px" class="filter-item">
+        <el-option v-for="comp in companyOptions" :key="comp.key" :label="comp.value" :value="comp.key" />
       </el-select>
-      <el-select v-model="searchQuery.sales" placeholder="营业负责" clearable class="filter-item" style="width: 200px">
+      <el-select v-model="searchQuery.sales" placeholder="营业负责" clearable filterable class="filter-item" style="width: 200px">
         <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.key" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" style="margin-left: 20px" @click="search">
@@ -36,7 +36,7 @@
           <el-tag v-if="row.contactflg" :title="row.contactflg=1?'该联系了':null" style="background-color: #99CC33">
             <svg-icon icon-class="email" />
           </el-tag>
-          <el-tag v-if="row.prjflg" :title="row.prjflg=1?'有在谈项目':null" style="background-color: #FFCC33">
+          <el-tag v-if="row.prjflg" :title="'有在谈项目'" style="background-color: #FFCC33">
             <svg-icon icon-class="form" />
           </el-tag>
           <el-tag v-if="row.wngtext" :title="row.wngtext" style="background-color: #FF6633">
@@ -91,45 +91,42 @@
       </el-table-column>
       <el-table-column label="重要度" width="100px" align="center">
         <template slot-scope="{row}">
-          <span v-if="row.bpimpt == '11'">重要BP</span>
-          <span v-if="row.bpimpt == '90'">潜在BP</span>
-          <span v-if="row.bpimpt == '12'">一般BP</span>
-          <span v-if="row.bpimpt == '03'">○</span>
+          <span>{{ row.bpimptName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="受注案件" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.anken }}</span>
+          <span>{{ row.vPrjcnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="受注人次" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.peonum }}</span>
+          <span>{{ row.vFzcnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="协力人次" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.ptnnum }}</span>
+          <span>{{ row.vTgcnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="客面人次" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.audtnum }}</span>
+          <span>{{ row.kmcnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="提案人次" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.apltnum }}</span>
+          <span>{{ row.tTacnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="技术人数" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.pronum }}</span>
+          <span>{{ row.psnCnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="客户人数" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.bpcustm }}</span>
+          <span>{{ row.custpsnCnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="沟通频率" width="100px" align="center">
@@ -169,12 +166,7 @@
       </el-table-column>
       <el-table-column label="优先提醒度" width="100px" align="center">
         <template slot-scope="{row}">
-          <span v-if="row.wnglvl == '1'">不急</span>
-          <span v-if="row.wnglvl == '2'">可缓</span>
-          <span v-if="row.wnglvl == '3'">一般</span>
-          <span v-if="row.wnglvl == '4'">优先</span>
-          <span v-if="row.wnglvl == '5'">紧急</span>
-          <span v-if="row.wnglvl == '6'">特急</span>
+          <span>{{ row.wnglvlName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="提醒事项" width="100px" align="center">
@@ -184,7 +176,7 @@
       </el-table-column>
       <el-table-column label="在谈项目" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.prjflg?'Yes':null }}</span>
+          <span>{{ row.prjflg == '1'?'Yes':(row.prjflg == '0'?'No':null) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="登记日时" width="100px" align="center">
@@ -226,7 +218,7 @@
           <el-input v-model="temp.hpurl" />
         </el-form-item>
         <el-form-item label="营业负责" prop="salesName">
-          <el-select v-model="temp.salesName" class="filter-item" placeholder="请选择营业负责人">
+          <el-select v-model="temp.salesName" class="filter-item" filterable placeholder="请选择营业负责人">
             <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -236,9 +228,9 @@
         <el-form-item label="所属国" prop="country">
           <el-input v-model="temp.country" />
         </el-form-item>
-        <el-form-item label="重要度" prop="bpimpt">
-          <el-select v-model="temp.bpimpt" class="filter-item" placeholder="请选择重要度">
-            <el-option v-for="item in BPimptOptions" :key="item.key" :label="item.label" :value="item.key" />
+        <el-form-item label="重要度" prop="bpimptName">
+          <el-select v-model="temp.bpimptName" class="filter-item" filterable placeholder="请选择重要度">
+            <el-option v-for="item in BPimptOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
         <el-form-item label="沟通频率" prop="maxcnttdays">
@@ -256,9 +248,9 @@
         <el-form-item label="传真" prop="fax">
           <el-input v-model="temp.fax" />
         </el-form-item>
-        <el-form-item label="优先提醒度" prop="wnglvl">
-          <el-select v-model="temp.wnglvl" class="filter-item" placeholder="请选择优先度">
-            <el-option v-for="item in SuperiorityOptions" :key="item.key" :label="item.label" :value="item.key" />
+        <el-form-item label="优先提醒度" prop="wnglvlName">
+          <el-select v-model="temp.wnglvlName" class="filter-item" filterable placeholder="请选择优先度">
+            <el-option v-for="item in wnglvlNameOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
         <el-form-item label="提醒事项" prop="wngtext">
@@ -277,20 +269,10 @@
         </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="近期沟通记录">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="沟通方式" />
-        <el-table-column prop="pv" label="沟通日时" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">关闭</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 <script>
-import { fetchList, getSalesList, DeleteBP, createArticle, searchBP, updateArticle } from '@/api/article'
+import { fetchList, getMaster, getCompanyList, getSalesList, DeleteBP, createArticle, searchBP, updateArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -330,36 +312,6 @@ export default {
       list: [
         {
           id: 1,
-          contactflg: null,
-          bpShort: 'cpn',
-          bpCode: 'BP0001',
-          bpName: '会社001',
-          hpurl: 'https://panjiachen.github.io/vue-element-admin/#/icon/index',
-          contactdate: '20211102',
-          sales: 'YangXF',
-          empcnt: '122',
-          country: '日本',
-          bpimpt: 2,
-          anken: '○○证券次期基盘系统开发',
-          peonum: 20,
-          ptnnum: 5,
-          audtnum: 35,
-          apltnum: 50,
-          pronum: 15,
-          bpcustm: 3,
-          maxcnttdays: 30,
-          zipcode: '3320001',
-          address: '川口市青木区2-1-1',
-          tel: '08079064567',
-          fax: '03023456',
-          bpMemo: 'memommmmmmmm',
-          contactcnt: 3,
-          wnglvl: '不急',
-          wngtext: '次期项目下个月要开始了',
-          prjflg: 1,
-          prjflgMemo: '有在谈项目！',
-          createtime: 20211102,
-          createuser: '操作员Y'
         }
       ],
       total: 0,
@@ -373,25 +325,17 @@ export default {
           company: '',
           },
       companyOptions:  [
-        { code: '', name: '' }
+        { key: '', value: '' }
       ],
       salesOptions: [
         { key: '', value: '' }
       ],
-      SuperiorityOptions: [
-        { key: '1' , label: '不急'},
-        { key: '2' , label: '可缓'},
-        { key: '3' , label: '一般'},
-        { key: '4' , label: '优先'},
-        { key: '5' , label: '紧急'},
-        { key: '6' , label: '特急'}
+      wnglvlNameOptions: [
+        { key: '', value: '' }
       ],
       BPimptOptions: [
-        { key: '03' , label: '○'},
-        { key: 11 , label: '重要BP'},
-        { key: 12 , label: '一般BP'},
-        { key: 90 , label: '潜在BP'}
-      ],
+          { key: '', value: '' }
+        ],
       calendarTypeOptions,
       temp: {
         id: undefined,
@@ -427,21 +371,9 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(response => {
-        for(var i=0;i<response.data.length;i++){
-          var obj = {
-            code: response.data[i].bpid,
-            name: response.data[i].bpShort + ' | ' +response.data[i].bpName}
-          this.companyOptions.push(obj)
-        }
         this.list = response.data
         this.total = response.total
         this.listLoading = false
-        //获取当前BP名
-        /* this.companyOptions.shift() */
-        console.log(response.data.length)
-        this.companyOptions.shift()
-        console.log(this.companyOptions)
-        // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
         }, 1.5 * 1000)
@@ -455,6 +387,19 @@ export default {
         /* this.salesOptions = response.data */
         console.log(this.salesOptions)
       })
+    //获取BPList(检索用)
+    getCompanyList().then(response => {
+      this.companyOptions = response.data
+    })
+    //获取BPimptOptions
+    getMaster('bpimpt').then(response => {
+      this.BPimptOptions = response.data
+    })
+
+    //获取wnglvlNameOptions
+    getMaster('wnglvl').then(response => {
+      this.wnglvlNameOptions = response.data
+    })
     },
     jumpUrl(e){
      /* this.$router.push({path:e}) */
@@ -526,6 +471,8 @@ export default {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
       this.temp.tempSales = this.temp.salesName
+      this.temp.tempBpimptName = this.temp.bpimptName
+      this.temp.tempWnglvlName = this.temp.wnglvlName
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -541,6 +488,14 @@ export default {
             if(tempData.tempSales !== tempData.salesName){
               tempData.sales = tempData.salesName
             }
+          //返回bpimpt
+          if(tempData.tempBpimptName !== tempData.bpimptName){
+            tempData.bpimpt = tempData.bpimptName
+          }
+          //返回wnglvl
+          if(tempData.tempWnglvlName !== tempData.wnglvlName){
+            tempData.wnglvl = tempData.wnglvlName
+          }
           updateArticle(tempData).then(() => {
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)

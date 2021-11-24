@@ -1,5 +1,15 @@
 import request from '@/utils/request'
 
+//
+export function getMaster(key) {
+  return request({
+    url: '/BPList/getMaster',
+    method: 'get',
+    params: {keyName:key},
+    baseURL: '/backend' // 直接通过覆盖的方式
+  })
+}
+
 //获取BPList
 export function fetchList(query) {
   return request({
@@ -18,6 +28,14 @@ export function getSalesList() {
   })
 }
 
+//获取CompanyList(检索用)
+export function getCompanyList() {
+  return request({
+    url: '/BPList/getCompanyList',
+    method: 'get',
+    baseURL: '/backend' // 直接通过覆盖的方式
+  })
+}
 
 //获取prjList(检索用)
 export function getPrjList() {
@@ -104,7 +122,7 @@ export function contactSearch(query) {
   })
 }
 
-//删除一条BP数据
+//删除一条Contact数据
 export function DeleteContact(id) {
   return request({
     url: '/BPList/deleteContactById',
@@ -129,6 +147,55 @@ export function updateContact(data) {
 export function createContact(data) {
   return request({
     url: '/BPList/createContact',
+    method: 'post',
+    baseURL: '/backend', // 直接通过覆盖的方式
+    data
+  })
+}
+
+//获取CustomList
+export function getCustomList() {
+  return request({
+    url: '/BPList/getCustomList',
+    method: 'get',
+    baseURL: '/backend' // 直接通过覆盖的方式
+  })
+}
+
+//删除一条Custom数据
+export function DeleteCustom(id) {
+  return request({
+    url: '/BPList/deleteCustomById',
+    method: 'get',
+    baseURL: '/backend', // 直接通过覆盖的方式
+    params: {id}
+  })
+}
+
+//更新一条Custom数据
+export function customUpdate(data) {
+  return request({
+    url: '/BPList/customUpdate',
+    method: 'post',
+    baseURL: '/backend', // 直接通过覆盖的方式
+    data
+  })
+}
+//根据条件检索CustomList
+export function CustomSearch(query) {
+  return request({
+    url: '/BPList/CustomSearch',
+    method: 'get',
+    params: query,
+    baseURL: '/backend' // 直接通过覆盖的方式
+  })
+}
+
+
+//新增一条Contact数据
+export function createCustom(data) {
+  return request({
+    url: '/BPList/createCustom',
     method: 'post',
     baseURL: '/backend', // 直接通过覆盖的方式
     data

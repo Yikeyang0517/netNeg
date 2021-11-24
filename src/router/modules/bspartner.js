@@ -8,7 +8,7 @@ const BPRouter = {
   redirect: '/bpmanagement/bplist',
   name: 'Table',
   meta: {
-    title: 'BP列表',
+    title: '客户库',
     icon: 'table'
   },
   children: [
@@ -19,9 +19,9 @@ const BPRouter = {
       meta: { title: 'BP列表' }
     },
     {
-      path: 'bpmember',
-      component: () => import('@/views/bpmanagement/bpmember'),
-      name: 'bpmember',
+      path: 'custpsn',
+      component: () => import('@/views/bpmanagement/custpsn'),
+      name: 'custpsn',
       meta: { title: '客户人员' }
     },
     {

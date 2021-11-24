@@ -1,12 +1,12 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-select v-model="searchQuery.company" placeholder="协力公司" clearable style="width: 200px" class="filter-item">
-        <el-option v-for="comp in companyOptions" :key="comp.code" :label="comp.name" :value="comp.name" />
+      <el-select v-model="searchQuery.company" placeholder="协力公司" clearable filterable style="width: 200px" class="filter-item">
+        <el-option v-for="comp in companyOptions" :key="comp.key" :label="comp.value" :value="comp.key" />
       </el-select>
-      <el-input placeholder="姓名" v-model="mbname" clearable style="width: 200px" class="filter-item"/>
-      <el-select v-model="searchQuery.sales" placeholder="营业负责" clearable class="filter-item" style="width: 200px">
-        <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.value" />
+      <el-input placeholder="姓名" v-model="searchQuery.custpsnName" clearable style="width: 200px" class="filter-item"/>
+      <el-select v-model="searchQuery.sales" placeholder="营业负责" clearable filterable class="filter-item" style="width: 200px">
+        <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.key" />
       </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" style="margin-left: 20px" @click="search">
         搜索
@@ -14,9 +14,9 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit" @click="handleCreate">
         添加
       </el-button>
-      <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+      <!-- <el-button v-waves :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         导出
-      </el-button>
+      </el-button> -->
       <svg-icon class="link-type" style="margin-left: 10px;" icon-class="peoples" @click="goContactList(0)" />
     </div>
 
@@ -39,17 +39,12 @@
         <el-checkbox></el-checkbox>
       </template>
       </el-table-column>
-      <el-table-column label="chk" width="50px">
-        <template slot-scope="{row}">
-          <span>{{ row.chk }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="提醒" class-name="status-col" width="150">
         <template slot-scope="{row}">
           <el-tag v-if="row.contactflg" :title="row.contactflg=1?'该联系了':null" style="background-color: #99CC33">
             <svg-icon icon-class="email" />
           </el-tag>
-          <el-tag v-if="row.prjflg" :title="row.prjflg=1?'有在谈项目':null" style="background-color: #FFCC33">
+          <el-tag v-if="row.prjflg" :title="'有在谈项目'" style="background-color: #FFCC33">
             <svg-icon icon-class="form" />
           </el-tag>
           <el-tag v-if="row.wngtext" :title="row.wngtext" style="background-color: #FF6633">
@@ -59,138 +54,117 @@
       </el-table-column>
       <el-table-column label="姓名" width="100px">
         <template slot-scope="{row}">
-          <span>{{ row.bpShort }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="BP" width="200px">
-        <template slot-scope="{row}">
-          <span>{{ row.bpShort }} | {{ row.bpName }}</span>
+          <span>{{ row.custpsnName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="上次沟通日期" width="120px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.contactdate | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.contactdate | parseTime('{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="BP" width="200px">
+        <template slot-scope="{row}">
+          <span>{{ row.bpName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="沟通记录" align="center" width="95">
         <template slot-scope="{row}">
-          <svg-icon class="link-type" icon-class="peoples" @click="goContactList(0)" />
+          <svg-icon class="link-type" icon-class="peoples" @click="goContactList(row.custpsnId)" />
         </template>
       </el-table-column>
       <el-table-column label="公司职务" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.empcnt }}</span>
+          <span>{{ row.position }}</span>
         </template>
       </el-table-column>
       <el-table-column label="名片" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.empcnt }}</span>
+          <span>{{ row.cardfile }}</span>
         </template>
       </el-table-column>
       <el-table-column label="性别" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.empcnt }}</span>
+          <span>{{ row.sexName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="年龄" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.empcnt }}</span>
+          <span>{{ row.old }}</span>
         </template>
       </el-table-column>
       <el-table-column label="国籍" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.country }}</span>
+          <span>{{ row.countryName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="BP负责" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.sales }}</span>
+          <span>{{ row.bpSalesName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="营业负责" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.sales }}</span>
+          <span>{{ row.salesName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="笔记" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.bpMemo }}</span>
+          <span>{{ row.custpsnMemo }}</span>
         </template>
-      </el-table-column>
       </el-table-column>
       <el-table-column label="受注案件" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.anken }}</span>
+          <span>{{ row.vPrjcnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="受注人次" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.peonum }}</span>
+          <span>{{ row.vFzcnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="协力人次" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.ptnnum }}</span>
+          <span>{{ row.vTgcnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="客面人次" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.audtnum }}</span>
+          <span>{{ row.kmcnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="提案人次" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.apltnum }}</span>
+          <span>{{ row.tTacnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="技术人数" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.pronum }}</span>
+          <span>{{ row.psnCnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="客户人数" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.bpcustm }}</span>
+          <span>{{ row.custpsnCnt }}</span>
         </template>
       </el-table-column>
       <el-table-column label="最近车站" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.address }}</span>
+          <span>{{ row.psnStation }}</span>
         </template>
       </el-table-column>
       <el-table-column label="出生年月日" width="120px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.contactdate | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="沟通频率" width="100px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.maxcnttdays }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="邮编" width="100px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.zipcode }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="地址" width="100px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.address }}</span>
+          <span>{{ row.birthday | parseTime('{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="电话" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.tel }}</span>
+          <span>{{ row.psnTel1 }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="传真" width="100px" align="center">
+      <el-table-column label="电子邮件" width="100px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.fax }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="笔记" width="100px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.bpMemo }}</span>
+          <span>{{ row.email }}</span>
         </template>
       </el-table-column>
       <el-table-column label="沟通次数" width="100px" align="center">
@@ -198,27 +172,24 @@
           <span>{{ row.contactcnt }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="沟通频率" width="100px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.maxcnttdays }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="在谈项目" width="100px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.prjflg == '1'?'Yes':(row.prjflg == '0'?'No':null) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="优先提醒度" width="100px" align="center">
         <template slot-scope="{row}">
-          <!-- <span v-switch="row.wnglvl">
-            <h1 v-case="1">不急</h1>
-            <h2 v-case="2">可缓</h2>
-            <h2 v-case="3">一般</h2>
-            <h2 v-case="4">优先</h2>
-            <h2 v-case="5">紧急</h2>
-            <h2 v-case="6">特急</h2>
-          </span> -->
-          <span>{{ row.wnglvl }}</span>
+          <span>{{ row.wnglvlName }}</span>
         </template>
       </el-table-column>
       <el-table-column label="提醒事项" width="100px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.wngtext }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="在谈项目" width="100px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.prjflg?'Yes':null }}</span>
         </template>
       </el-table-column>
       <el-table-column label="登记日时" width="100px" align="center">
@@ -231,12 +202,22 @@
           <span>{{ row.createuser }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="更新日时" width="100px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.updatetime | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="更新人" width="100px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.updateuser }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="更新/删除" align="center" width="150" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(row,$index)">
+          <el-button size="mini" type="danger" @click="handleDelete(row.custpsnId)">
             删除
           </el-button>
         </template>
@@ -247,87 +228,68 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="公司名称" prop="bpName">
-          <el-input v-model="temp.bpName" />
+        <el-form-item label="姓名" prop="custpsnName">
+          <el-input v-model="temp.custpsnName" />
         </el-form-item>
-        <el-form-item label="简称" prop="bpShort">
-          <el-input v-model="temp.bpShort" />
-        </el-form-item>
-        <el-form-item label="客户编号" prop="bpCode">
-          <el-input v-model="temp.bpCode" />
-        </el-form-item>
-        <el-form-item label="公司网址" prop="hpurl">
-          <el-input v-model="temp.hpurl" />
-        </el-form-item>
-        <el-form-item label="营业负责" prop="sales">
-          <el-select v-model="temp.sales" class="filter-item" placeholder="请选择营业负责人">
-            <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.value" />
+        <el-form-item label="BP" prop="bpName">
+          <el-select v-model="temp.bpName" class="filter-item" filterable placeholder="请选择BP" readonly="true">
+            <el-option v-for="item in companyOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
-        <el-form-item label="公司人数" prop="empcnt">
-          <el-input v-model="temp.empcnt" />
+        <el-form-item label="公司职务" prop="position">
+          <el-input v-model="temp.position" />
         </el-form-item>
-        <el-form-item label="所属国" prop="country">
-          <el-input v-model="temp.country" />
+        <el-form-item label="名片" prop="cardfile">
+          <el-input v-model="temp.cardfile" />
         </el-form-item>
-        <el-form-item label="重要度" prop="bpimpt">
-          <el-input v-model="temp.bpimpt" />
+        <el-form-item label="性别" prop="sexName">
+          <el-select v-model="temp.sexName" class="filter-item" filterable placeholder="请选择性别">
+            <el-option v-for="item in sexNameOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="受注案件" prop="anken">
-          <el-input v-model="temp.anken" />
+        <el-form-item label="年龄" prop="old">
+          <el-input v-model="temp.old" />
         </el-form-item>
-        <el-form-item label="受注人次" prop="peonum">
-          <el-input v-model="temp.peonum" />
+        <el-form-item label="国籍" prop="countryName">
+          <el-select v-model="temp.countryName" class="filter-item" filterable placeholder="请选择国籍">
+            <el-option v-for="item in countryNameOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="协力人次" prop="ptnnum">
-          <el-input v-model="temp.ptnnum" />
+        <el-form-item label="营业负责" prop="salesName">
+          <el-select v-model="temp.salesName" class="filter-item" filterable placeholder="请选择营业负责人">
+            <el-option v-for="item in salesOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="客面人次" prop="audtnum">
-          <el-input v-model="temp.audtnum" />
+        <el-form-item label="笔记" prop="custpsnMemo">
+          <el-input v-model="temp.custpsnMemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
-        <el-form-item label="提案人次" prop="apltnum">
-          <el-input v-model="temp.apltnum" />
+        <el-form-item label="最近车站" prop="psnStation">
+          <el-input v-model="temp.psnStation" />
         </el-form-item>
-        <el-form-item label="技术人数" prop="pronum">
-          <el-input v-model="temp.pronum" />
+        <el-form-item label="出生年月日" prop="birthday">
+          <el-date-picker v-model="temp.birthday" type="date" placeholder="请选择出生年月日" />
         </el-form-item>
-        <el-form-item label="客户人数" prop="bpcustm">
-          <el-input v-model="temp.bpcustm" />
+        <el-form-item label="电话" prop="psnTel1">
+          <el-input v-model="temp.psnTel1" />
+        </el-form-item>
+        <el-form-item label="电子邮件" prop="email">
+          <el-input v-model="temp.email" />
         </el-form-item>
         <el-form-item label="沟通频率" prop="maxcnttdays">
           <el-input v-model="temp.maxcnttdays" />
         </el-form-item>
-        <el-form-item label="邮编" prop="zipcode">
-          <el-input v-model="temp.zipcode" />
+        <el-form-item label="在谈项目" prop="prjflg">
+          <el-select v-model="temp.prjflg" class="filter-item" filterable placeholder="请选择项目状态">
+            <el-option v-for="item in prjflgOptions" :key="item.key" :label="item.value" :value="item.key" />
+          </el-select>
         </el-form-item>
-        <el-form-item label="地址" prop="address">
-          <el-input v-model="temp.address" />
-        </el-form-item>
-        <el-form-item label="电话" prop="tel">
-          <el-input v-model="temp.tel" />
-        </el-form-item>
-        <el-form-item label="传真" prop="fax">
-          <el-input v-model="temp.fax" />
-        </el-form-item>
-        <el-form-item label="优先提醒度" prop="wnglvl">
-          <el-select v-model="temp.wnglvl" class="filter-item" placeholder="请选择优先度">
-            <el-option v-for="item in SuperiorityOptions" :key="item" :label="item" :value="item" />
+        <el-form-item label="优先提醒度" prop="wnglvlName">
+          <el-select v-model="temp.wnglvlName" class="filter-item" filterable placeholder="请选择优先度">
+            <el-option v-for="item in wnglvlNameOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
         <el-form-item label="提醒事项" prop="wngtext">
           <el-input v-model="temp.wngtext" />
-        </el-form-item>
-        <el-form-item label="在谈项目" prop="prjflg">
-          <el-input v-model="temp.prjflg" />
-        </el-form-item>
-        <el-form-item label="笔记" prop="bpMemo">
-          <el-input v-model="temp.bpMemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
-        </el-form-item>
-        <el-form-item label="登记日时" prop="createtime">
-          <el-date-picker v-model="temp.createtime" type="datetime" placeholder="请选择创建时间" />
-        </el-form-item>
-        <el-form-item label="登记人" prop="createuser">
-          <el-input v-model="temp.createuser" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -339,21 +301,11 @@
         </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog :visible.sync="dialogPvVisible" title="近期沟通记录">
-      <el-table :data="pvData" border fit highlight-current-row style="width: 100%">
-        <el-table-column prop="key" label="沟通方式" />
-        <el-table-column prop="pv" label="沟通日时" />
-      </el-table>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogPvVisible = false">关闭</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, searchItemSales, fetchPv, createArticle, updateArticle } from '@/api/article'
+import { getMaster, getCustomList, getCompanyList, getSalesList, fetchList, DeleteCustom, searchItemSales, CustomSearch, createCustom, customUpdate } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -395,149 +347,36 @@ export default {
       list: [
         {
           id: 1,
-          contactflg: null,
-          bpShort: 'cpn',
-          bpCode: 'BP0001',
-          bpName: '会社001',
-          hpurl: 'https://panjiachen.github.io/vue-element-admin/#/icon/index',
-          contactdate: 20211102,
-          sales: 'YangXF',
-          empcnt: '122',
-          country: '日本',
-          bpimpt: 2,
-          anken: '○○证券次期基盘系统开发',
-          peonum: 20,
-          ptnnum: 5,
-          audtnum: 35,
-          apltnum: 50,
-          pronum: 15,
-          bpcustm: 3,
-          maxcnttdays: 30,
-          zipcode: '3320001',
-          address: '川口市青木区2-1-1',
-          tel: '08079064567',
-          fax: '03023456',
-          bpMemo: 'memommmmmmmm',
-          contactcnt: 3,
-          wnglvl: '不急',
-          wngtext: '次期项目下个月要开始了',
-          prjflg: 1,
-          prjflgMemo: '有在谈项目！',
-          createtime: 20211102,
-          createuser: '操作员Y'
-        },
-        {
-          id: 2,
-          contactflg: '需要联系了',
-          bpShort: 'ygp',
-          bpCode: 'BP0002',
-          bpName: '会社002',
-          hpurl: 'https://panjiachen.github.io/vue-element-admin/#/icon/index',
-          contactdate: 20211105,
-          sales: 'YangXF',
-          empcnt: '19',
-          country: '日本',
-          bpimpt: 2,
-          anken: '○○证券次期基盘系统开发',
-          peonum: 20,
-          ptnnum: 5,
-          audtnum: 35,
-          apltnum: 50,
-          pronum: 15,
-          bpcustm: 3,
-          maxcnttdays: 30,
-          zipcode: '3320001',
-          address: '川口市青木区2-1-1',
-          tel: '08079064567',
-          fax: '03023456',
-          bpMemo: 'memommmmmmmm',
-          contactcnt: 3,
-          wnglvl: null,
-          wngtext: null,
-          prjflg: 1,
-          prjflgMemo: '有在谈项目！',
-          createtime: 20211102,
-          createuser: '操作员Y'
-        },
-        {
-          id: 3,
-          contactflg: '该联系了',
-          bpShort: 'cpn',
-          bpCode: 'BP0001',
-          bpName: '会社001',
-          hpurl: 'https://panjiachen.github.io/vue-element-admin/#/icon/index',
-          contactdate: 20211102,
-          sales: 'YangXF',
-          empcnt: '122',
-          country: '日本',
-          bpimpt: 2,
-          anken: '○○证券次期基盘系统开发',
-          peonum: 20,
-          ptnnum: 5,
-          audtnum: 35,
-          apltnum: 50,
-          pronum: 15,
-          bpcustm: 3,
-          maxcnttdays: 30,
-          zipcode: '3320001',
-          address: '川口市青木区2-1-1',
-          tel: '08079064567',
-          fax: '03023456',
-          bpMemo: 'memommmmmmmm',
-          contactcnt: 3,
-          wnglvl: '紧急',
-          wngtext: '次期项目下个月要开始了',
-          prjflg: 1,
-          prjflgMemo: '有在谈项目！',
-          createtime: 20211101210912,
-          createuser: '操作员Y'
-        },
-        {
-          id: 4,
-          contactflg: null,
-          bpShort: 'ygp',
-          bpCode: 'BP0002',
-          bpName: '会社002',
-          hpurl: 'https://www.yahoo.co.jp',
-          contactdate: 20211105,
-          sales: 'YangXF',
-          empcnt: '19',
-          country: '日本',
-          bpimpt: 2,
-          anken: '○○证券次期基盘系统开发',
-          peonum: 20,
-          ptnnum: 5,
-          audtnum: 35,
-          apltnum: 50,
-          pronum: 15,
-          bpcustm: 3,
-          maxcnttdays: 30,
-          zipcode: '3320001',
-          address: '川口市青木区2-1-1',
-          tel: '08079064567',
-          fax: '03023456',
-          bpMemo: 'memommmmmmmm',
-          contactcnt: 3,
-          wnglvl: null,
-          wngtext: null,
-          prjflg: null,
-          prjflgMemo: '有在谈项目！',
-          createtime: 20211101210912,
-          createuser: '操作员Y'
         }
       ],
       total: 0,
+      mbname: '',
       listLoading: false,
       listQuery: { userId: 'yxf' },
       searchQuery:{
         company: '',
         sales: '',
+        custpsnName: '',
         },
       companyOptions:  [
-        { code: '', name: '' }
+        { key: '', value: '' }
       ],
       salesOptions: [
         { key: '', value: '' }
+      ],
+      sexNameOptions: [
+        { key: '', value: '' }
+      ],
+      countryNameOptions: [
+        { key: '', value: '' }
+      ],
+      wnglvlNameOptions: [
+        { key: '', value: '' }
+      ],
+      prjflgOptions: [
+        { key: '1', value: 'Yes' },
+        { key: '0', value: 'No' },
+        { key: null, value: null }
       ],
       SuperiorityOptions: ['不急', '可缓', '一般', '优先', '紧急', '特急'],
       calendarTypeOptions,
@@ -558,7 +397,6 @@ export default {
         update: '更新',
         create: '新增'
       },
-      dialogPvVisible: false,
       pvData: [
       ],
       rules: {
@@ -576,22 +414,11 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        console.log('已经返回请求数据、、、、、、、、、、')
-        console.log(response.data)
+      getCustomList().then(response => {
         this.list = response.data
         this.total = response.total
         this.listLoading = false
-        //获取当前BP名
-        /* this.companyOptions.shift() */
-        console.log(response.data.length)
-        this.companyOptions.shift()
-        for(var i=0;i<response.data.length;i++){
-          var obj = {
-            code: response.data[i].bpCode,
-            name: response.data[i].bpShort + ' | ' +response.data[i].bpName}
-          this.companyOptions.push(obj)
-        }
+
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
@@ -600,12 +427,29 @@ export default {
     },
     getMasterList(){
     //获取营业负责人List(检索用)
-      searchItemSales().then(response => {
+      getSalesList().then(response => {
         this.salesOptions = response.data
-        console.log('返回营业负责人list')
-        /* this.salesOptions = response.data */
-        console.log(this.salesOptions)
       })
+    //获取BPList(检索用)
+    getCompanyList().then(response => {
+      this.companyOptions = response.data
+    })
+
+      //获取sexNameOptions
+      getMaster('sex').then(response => {
+        this.sexNameOptions = response.data
+      })
+
+      //获取countryNameOptions
+      getMaster('country').then(response => {
+        this.countryNameOptions = response.data
+      })
+
+      //获取wnglvlNameOptions
+      getMaster('wnglvl').then(response => {
+        this.wnglvlNameOptions = response.data
+      })
+
     },
     jumpUrl(e){
      /* this.$router.push({path:e}) */
@@ -615,7 +459,7 @@ export default {
     search() {
       console.log('检索时传参内容')
       console.log(this.searchQuery)
-      fetchList(this.searchQuery).then(response => {
+      CustomSearch(this.searchQuery).then(response => {
         this.list = response.data
         this.total = response.total
 
@@ -624,13 +468,18 @@ export default {
           this.listLoading = false
         }, 1.5 * 1000)
       })
-      this.getList()
     },
-    goContactList(member){
-      if(member==0){
+    goContactList(customId){
+      if(customId!=0){
+        this.$router.push({
+          path:'/bpmanagement/contactlist',
+          query:{
+            custpsn:customId,
+            }
+          })
+      }else{
         this.$router.push({path:'/bpmanagement/contactlist'})
       }
-     /* this.$router.push({path:'/contactlist'},query:{Id:member}) */
     },
     resetTemp() {
       this.temp = {
@@ -654,10 +503,18 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.id = parseInt(Math.random() * 100) + 1024 // mock a id
-          this.temp.author = 'vue-element-admin'
-          createArticle(this.temp).then(() => {
-            this.list.unshift(this.temp)
+          const tempData = Object.assign({}, this.temp)
+          tempData.createtime = this.dateTimeFormat(new Date())
+          tempData.birthday = this.dateTimeFormat(tempData.birthday)
+          tempData.createuser = 'tempAccount'
+          tempData.contactdate = this.dateFormat(new Date())
+          tempData.sales = tempData.salesName
+          tempData.bpid = tempData.bpName
+          tempData.sex = tempData.sexName
+          tempData.country = tempData.countryName
+          tempData.wnglvl = tempData.wnglvlName
+          createCustom(tempData).then(() => {
+            this.getList()
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -672,6 +529,10 @@ export default {
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
+      this.temp.tempSales = this.temp.salesName
+      this.temp.tempsexName = this.temp.sexName
+      this.temp.tempcountryName = this.temp.countryName
+      this.temp.tempwnglvlName = this.temp.wnglvlName
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
@@ -682,8 +543,26 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          tempData.timestamp = +new Date(tempData.timestamp) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
-          updateArticle(tempData).then(() => {
+          tempData.updatetime = this.dateTimeFormat(new Date()) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
+          tempData.birthday = this.dateFormat(tempData.birthday)
+          //返回salesId
+            if(tempData.tempSales !== tempData.salesName){
+              tempData.sales = tempData.salesName
+            }
+            //返回sex
+              if(tempData.tempsexName !== tempData.sexName){
+                tempData.sex = tempData.sexName
+              }
+            //返回country
+              if(tempData.tempcountryName !== tempData.countryName){
+                tempData.country = tempData.countryName
+              }
+            //返回wnglvl
+              if(tempData.tempwnglvlName !== tempData.wnglvlName){
+                tempData.wnglvl = tempData.wnglvlName
+              }
+          customUpdate(tempData).then(() => {
+            this.getList()
             const index = this.list.findIndex(v => v.id === this.temp.id)
             this.list.splice(index, 1, this.temp)
             this.dialogFormVisible = false
@@ -697,19 +576,37 @@ export default {
         }
       })
     },
-    handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
-      })
-      this.list.splice(index, 1)
+    dateFormat:function(time) {
+        var date=new Date(time);
+        var year=date.getFullYear();
+        /* 在日期格式中，月份是从0开始的，因此要加0
+         * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+         * */
+        var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1
+        var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate()
+        // 拼接
+        return year+''+month+day
     },
-    handleFetchPv(pv) {
-      fetchPv(pv).then(response => {
-        this.pvData = response.data.pvData
-        this.dialogPvVisible = true
+    dateTimeFormat:function(time) {
+        var date=new Date(time);
+        var year=date.getFullYear();
+        /* 在日期格式中，月份是从0开始的，因此要加0
+         * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+         * */
+        var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+        var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+        var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+        var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+        var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+        // 拼接
+        return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds;
+    },
+    handleDelete(id) {
+      DeleteCustom(id).then(response => {
+        this.getList()
+        setTimeout(() => {
+          this.listLoading = false
+        }, 1.5 * 1000)
       })
     },
     handleDownload() {
