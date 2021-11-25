@@ -26,8 +26,8 @@
       :data="list"
       border
       fit
-      highlight-current-row
       style="width: 100%;"
+      :row-style="tableRowStyle"
     >
       <el-table-column label="ID" prop="id" align="center" width="50" :class-name="getSortClass('id')">
         <template slot-scope="{row}">
@@ -36,7 +36,7 @@
       </el-table-column>
       <el-table-column label="chk" width="50px">
       <template slot-scope="{row}">
-        <el-checkbox></el-checkbox>
+        <el-checkbox v-model="row.checked" ></el-checkbox>
       </template>
       </el-table-column>
       <el-table-column label="提醒" class-name="status-col" width="150">
@@ -231,8 +231,8 @@
         <el-form-item label="姓名" prop="custpsnName">
           <el-input v-model="temp.custpsnName" />
         </el-form-item>
-        <el-form-item label="BP" prop="bpName">
-          <el-select v-model="temp.bpName" class="filter-item" filterable placeholder="请选择BP" readonly="true">
+        <el-form-item label="BP" prop="bpName" >
+          <el-select v-model="temp.bpName" :disabled="dialogStatus==='create'?false:true" class="filter-item" filterable placeholder="请选择BP" readonly="true">
             <el-option v-for="item in companyOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -347,6 +347,7 @@ export default {
       list: [
         {
           id: 1,
+          checked : false,
         }
       ],
       total: 0,
@@ -412,6 +413,14 @@ export default {
     this.getMasterList()
   },
   methods: {
+    tableRowStyle({row,rowIndex}){
+      let stylejson={}
+      if(row.checked){
+        stylejson.background = '#ff9e81'
+        return stylejson
+      }
+
+          },
     getList() {
       this.listLoading = true
       getCustomList().then(response => {
@@ -639,12 +648,3 @@ export default {
   }
 }
 </script>
-<style>
-  .suspenspan{
-    width: 100px;
-    height: 100px;
-    display: none;
-    position: absolute;
-    border: 1px solid #CCCCCC;
-  }
-</style>

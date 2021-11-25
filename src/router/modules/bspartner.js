@@ -25,6 +25,12 @@ const BPRouter = {
       meta: { title: '客户人员' }
     },
     {
+      path: 'test',
+      component: () => import('@/views/bpmanagement/test'),
+      name: 'test',
+      meta: { title: 'test' }
+    },
+    {
       path: 'contactlist',
       component: () => import('@/views/bpmanagement/contactlist'),
       name: 'contactlist',
