@@ -261,7 +261,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="笔记" prop="custpsnMemo">
-          <el-input v-model="temp.custpsnMemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+          <el-input v-model="temp.custpsnMemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="请输入摘要内容" />
         </el-form-item>
         <el-form-item label="最近车站" prop="psnStation">
           <el-input v-model="temp.psnStation" />

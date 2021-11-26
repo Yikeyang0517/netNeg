@@ -257,7 +257,7 @@
           <el-input v-model="temp.wngtext" />
         </el-form-item>
         <el-form-item label="笔记" prop="bpMemo">
-          <el-input v-model="temp.bpMemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
+          <el-input v-model="temp.bpMemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="请输入摘要内容" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

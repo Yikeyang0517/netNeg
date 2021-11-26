@@ -156,8 +156,8 @@
         <el-form-item label="沟通日期" prop="contactdate">
           <el-date-picker v-model="temp.contactdate" type="date" placeholder="请选择沟通日期" />
         </el-form-item>
-        <el-form-item label="沟通类别" prop="cnttType">
-          <el-select v-model="temp.cnttType" class="filter-item" filterable placeholder="请选择沟通类别">
+        <el-form-item label="沟通类别" prop="cnttTypeName">
+          <el-select v-model="temp.cnttTypeName" class="filter-item" filterable placeholder="请选择沟通类别">
             <el-option v-for="item in cnttTypeOptions" :key="item.key" :label="item.value" :value="item.key" />
           </el-select>
         </el-form-item>
@@ -186,16 +186,10 @@
           <el-input v-model="temp.cnntime" />
         </el-form-item>
         <el-form-item label="耗时分钟" prop="workhours">
-          <el-input v-model="temp.workhours" />
+          <el-input v-model.number="temp.workhours" />
         </el-form-item>
         <el-form-item label="摘要" prop="psncnttmemo">
-          <el-input v-model="temp.psncnttmemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
-        </el-form-item>
-        <el-form-item label="登记日时" prop="createtime">
-          <el-date-picker v-model="temp.createtime" type="datetime" placeholder="请选择创建时间" />
-        </el-form-item>
-        <el-form-item label="登记人" prop="createuser">
-          <el-input v-model="temp.createuser" />
+          <el-input v-model="temp.psncnttmemo" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="请输入摘要内容" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -245,29 +239,67 @@ export default {
     }
   },
   data() {
+    var checkPsnName = (rule, value, callback) => {
+         if ( this.temp.cnttTypeName == '03'||this.temp.cnttTypeName == '31'
+         ||this.temp.cnttTypeName == '见面' || this.temp.cnttTypeName == '客面') {
+           if(!value){
+              return callback(new Error('请选择技术人员'));
+           }
+        } else {
+          callback();
+        }
+      };
+      var checkPrice = (rule, value, callback) => {
+           if ( this.temp.cnttTypeName == '03'||this.temp.cnttTypeName == '31'
+           ||this.temp.cnttTypeName == '见面' || this.temp.cnttTypeName == '客面') {
+             if(!value){
+                return callback(new Error('请记入提案价格'));
+             }
+          } else {
+            callback();
+          }
+        };
     return {
       tableKey: 0,
       tipMessage: '该联系了',
+      ruleForm: {
+                contactdate: '',
+                cnttTypeName: '',
+                custpsnName: '',
+                salesName: '',
+                workhours: '',
+                psnName: '',
+                price: '',
+              },
+      rules: {
+        contactdate: [
+          { required: true, message: '请选择沟通日期', trigger: 'change' }
+        ],
+        cnttTypeName: [
+          { required: true, message: '请选择沟通类型', trigger: 'red' },
+        ],
+        custpsnName: [
+          { required: true, message: '请选择客户人员', trigger: 'red' },
+        ],
+        salesName: [
+          { required: true, message: '请选择销售人员', trigger: 'red' },
+        ],
+        psnName: [
+          { validator: checkPsnName, trigger: 'red' },
+        ],
+        price: [
+          { validator: checkPrice, trigger: 'red' },
+        ],
+
+        workhours: [
+          { required: true, message: '请填写耗时分钟'},
+          { type: 'number', message: '请输入数字类型'}
+        ],
+      },
       list: [
 
         {
           id: 1,
-          prjName: 'mock项目01',
-          bpName: 'mock客户01',
-          custpsnName: 'mock客户人员01',
-          sales: 'mock销售01',
-          contactdate: 20211201111201,
-          cnttType: 1,
-          psnName: 1,
-          price: 1,
-          result: '01',
-          resumelvl: '1',
-          address: 'mock地址01',
-          cnntime: 1,
-          workhours: 1,
-          psncnttmemo: '有在谈项目！',
-          createtime: 20211101210912,
-          createuser: '操作员Y'
         }
       ],
       total: 0,
@@ -328,11 +360,6 @@ export default {
       dialogPvVisible: false,
       pvData: [
       ],
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
       downloadLoading: false
     }
   },
@@ -487,8 +514,7 @@ export default {
       })
     },
     createData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
+
           const tempData = Object.assign({}, this.temp)
           tempData.createtime = this.dateTimeFormat(new Date())
           tempData.createuser = 'tempAccount'
@@ -507,8 +533,6 @@ export default {
               duration: 2000
             })
           })
-        }
-      })
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
@@ -527,8 +551,6 @@ export default {
       })
     },
     updateData() {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
           const tempData = Object.assign({}, this.temp)
           tempData.updatetime = this.dateTimeFormat(new Date()) // change Thu Nov 30 2017 16:41:05 GMT+0800 (CST) to 1512031311464
           //返回prjId
@@ -555,7 +577,7 @@ export default {
             if(tempData.tempResult !== tempData.resultName){
               tempData.result = tempData.resultName
             }
-          //返回result
+          //返回resumelvl
             if(tempData.tempResumelvl !== tempData.resumelvlName){
               tempData.resumelvl = tempData.resumelvlName
             }
@@ -574,8 +596,6 @@ export default {
               duration: 2000
             })
           })
-        }
-      })
     },
     handleDelete(id) {
       DeleteContact(id).then(response => {
